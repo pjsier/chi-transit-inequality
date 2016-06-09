@@ -2,7 +2,7 @@
 <html lang="en" data-ng-app="app">
 <head>
   <meta charset="utf-8">
-  <title>Inequality &amp; Mass Transit in the Bay Area</title>
+  <title>Inequality &amp; Mass Transit in Chicago</title>
   <link href="./assets/css/bootstrap.css" rel="stylesheet">
   <link href="./assets/css/site.css" rel="stylesheet">
   <script src="./assets/libs/jquery.1.9.1.min.js"></script>
@@ -16,11 +16,10 @@
   <div class="container" data-ng-controller="AppCtrl">
     <div class="top row">
       <div class="span8">
-        <h2>Inequality &amp; Mass Transit in the Bay Area</h2>
-        <p class="byline">an experiment by <a href="http://twitter.com/dangrover">@dangrover</a> and <a href="http://twitter.com/mikez">@mikez</a></p>
+        <h2>Inequality &amp; Mass Transit in Chicago</h2>
+        <p class="byline">Based on an experiment by <a href="http://twitter.com/dangrover">@dangrover</a> and <a href="http://twitter.com/mikez">@mikez</a></p>
       </div>
-      <div id="share">
-        <!-- facebook gizmo -->
+      <!--<div id="share">
         <div id="fb-root"></div>
           <script>(function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0];if(d.getElementById(id))return;js=d.createElement(s);js.id=id;js.src="//connect.facebook.net/en_US/all.js#xfbml=1&appId=196057697206036";fjs.parentNode.insertBefore(js,fjs)})(document,"script","facebook-jssdk");
           </script>
@@ -45,13 +44,15 @@
         <iframe src="http://ghbtns.com/github-btn.html?user=dangrover&amp;repo=sf-transit-inequality&amp;type=watch&amp;count=true"
         allowtransparency="true" frameborder="0" scrolling="0" width="70" height="20">
         </iframe>
-      </div>
+      </div>-->
     </div>
 
     <div class="row">
       <div class="span8" id="intro">
-        <p><a href="http://newyorker.com/sandbox/business/subway.html">A recent feature in <i>The New Yorker</i></a>  
-          juxtaposed New York City's subway stops with their residents' incomes. Like NYC, San Francisco has people of <a href="http://www.sfgate.com/realestate/article/RICH-CITY-POOR-CITY-Middle-class-neighborhoods-2494307.php">both extreme poverty and wealth</a>, often living toe-to-toe. We wondered how those graphs would look in our neck of the woods. The results show the Bay Area's economic inequality and its relationship with transit and urban form.
+        <p><a href="http://newyorker.com/sandbox/business/subway.html">A feature in <i>The New Yorker</i></a>
+          juxtaposed New York City's subway stops with their residents' incomes.
+          Like NYC, San Francisco has people of <a href="http://www.sfgate.com/realestate/article/RICH-CITY-POOR-CITY-Middle-class-neighborhoods-2494307.php">both extreme poverty and wealth</a>,
+          often living toe-to-toe. We wondered how those graphs would look in our neck of the woods. The results show the Bay Area's economic inequality and its relationship with transit and urban form.
         </p>
         <br/>
       </div>
@@ -59,79 +60,16 @@
 
     <div class="row" data-ng-show="agencies">
       <div class="span3" id="choices" style="border-right: 1px solid #eee;">
-        <!-- MUNI -->
-        <h5 style="margin-top: 0; margin-bottom: 5px;">MUNI</h5>
-        <div class="agency-container">
-          <div class="btn-group dropdown muni-routes">
-            <div class="muni-line">
-              <a href="#" data-ng-click="displayRoute('MUNI', '1094')" style="background: #f8a637">J</a>
-            </div>
-            <div class="muni-line">
-              <a href="#" data-ng-click="displayRoute('MUNI', '1196', {'color_override':'#529cbb'})" style="background: #529cbb">K</a>
-            </div>
-            <div class="muni-line">
-              <a href="#" data-ng-click="displayRoute('MUNI', '1198')" style="background: #92278f">L</a>
-            </div>
-            <div class="muni-line">
-              <a href="#" data-ng-click="displayRoute('MUNI', '1199')" style="background: #028753">M</a>
-            </div>
-            <div class="muni-line">
-              <a href="#" data-ng-click="displayRoute('MUNI', '1093')" style="background: #00529a">N</a>
-            </div>
-            <div class="muni-line">
-              <a href="#" data-ng-click="displayRoute('MUNI', '1196',{'color_override':'#ed1c24'})" style="background: #ed1c24">T</a>
-            </div>
-
- <a id="muni-more" class="btn btn-link btn-small" data-toggle="dropdown" data-target="#" href="/">
-           More <b class="caret"></b>
-            </a>
-
-            <ul class="dropdown-menu" role="menu" aria-labelledby="muni-more">
-              <li data-ng-repeat="(routeId, route) in (agencies['MUNI'].routes | orderBy:'name')">
-                <a href="#" data-ng-click="displayRoute('MUNI', routeId)" data-ng-hide="route.important">
-                  {{route.name}}
-                </a>
-              </li>
-            </ul>
-
-          
-            
-          </div>
-        </div>
-
-        <!-- BART -->
-        <h5>BART</h5>
+        <!-- CTA Trains -->
+        <h5>CTA</h5>
         <div class="agency-container">
           <ul class="agency-routes nav nav-tabs nav-stacked">
-            <li data-ng-repeat="(routeId, route) in agencies['BART'].routes">
-              <a href="#" data-ng-click="displayRoute('BART', routeId)">
-                <span class="swatch" data-ng-style="{'background-color': route.color}"></span>
+            <li data-ng-repeat="(routeId, route) in agencies['CTA'].routes">
+              <a href="#" data-ng-click="displayRoute('CTA', routeId)">
+                <span class="swatch" data-ng-style="{'background-color': getRouteColor('CTA', routeId)}"></span>
                 {{route.name}}
               </a>
             </li>
-          </ul>
-        </div>
-
-
-        <h5>CalTrain</h5>
-        <div class="agency-container">
-          <ul class="agency-routes nav nav-tabs nav-stacked">
-            <li>
-              <a href="#" data-ng-click="displayRoute('CalTrain', 'ct_local_20121001')">
-                <span class="swatch" style="background-color: white"></span> 
-                Local</a>
-            </li>
-            <li>
-              <a href="#" data-ng-click="displayRoute('CalTrain', 'ct_limited_20121001')">
-                <span class="swatch" style="background-color: yellow"></span> 
-                Limited</a>
-            </li>
-          <li>
-              <a href="#" data-ng-click="displayRoute('CalTrain', 'ct_bullet_20121001')">
-                <span class="swatch" style="background-color: red"></span> 
-                Bullet</a>
-            </li>
-
           </ul>
         </div>
 

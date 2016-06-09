@@ -182,8 +182,8 @@ div svg {
 }
 
 div#map {
-    width: 525px;
-    height: 400px;
+    width: 400px;
+    height: 500px;
     position: absolute;
     top: 0;
     right: 0;
@@ -237,4 +237,3 @@ div#map {
 body.embeddable div#map {
     display: none;
 }
-

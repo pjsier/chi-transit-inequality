@@ -1,10 +1,23 @@
 angular.module('app', []);
 
 angular.module('app').constant('DATA_SOURCES',
-    ["data/MUNI.json", "data/BART.json", "data/CalTrain.json"]
+    ["data/CTA.json"]
     );
 
-angular.module('app').controller('AppCtrl', ['$scope', 'DATA_SOURCES', function($scope, DATA_SOURCES) {
+angular.module('app').constant('ROUTE_COLORS',
+    {
+        "Blue Line": "#00a1de",
+        "Brown Line": "#62361b",
+        "Green Line": "#009b3a",
+        "Orange Line": "#f9461c",
+        "Purple Line": "#522398",
+        "Pink Line": "#e27ea6",
+        "Red Line": "#c60c30",
+        "Yellow Line": "#f9e300"
+    }
+    );
+
+angular.module('app').controller('AppCtrl', ['$scope', 'DATA_SOURCES', 'ROUTE_COLORS', function($scope, DATA_SOURCES, ROUTE_COLORS) {
 
     // Load the data for each agency
     var agencyData = {};
@@ -24,20 +37,33 @@ angular.module('app').controller('AppCtrl', ['$scope', 'DATA_SOURCES', function(
     });
 
     // Load and show the map of CA
-    d3.json("data/ca-topo.json", function (error, ca_topojson){
-        map_data = ca_topojson;
-        
-        $scope.map_projection = d3.geo.albers().parallels([37.69,37.77]).scale(23000).translate([8000,1020]);
+    d3.json("data/chi_zip.topojson", function (error, geodata){
+        map_data = geodata;
+        var width = 400,
+            height = 500;
 
-        // Draw the coastline of the bay area
+        $scope.map_projection = d3.geo.mercator()
+          .scale(37502.1417964454)
+          .center([-87.73212684669582,41.83407063377036])
+          .translate([width/2,height/2]);
+        var path = d3.geo.path()
+          .projection($scope.map_projection);
+
+        // Draw the coastline of city borders based on the zip code map
         map_svg = d3.select("#map svg");
-        map_svg.append("path")
-        .attr("class","landmass")
-        .datum(topojson.feature(map_data, map_data.objects.ca))
-        .attr("d", d3.geo.path().projection($scope.map_projection));
-        
+        // Group for map features
+        var features = map_svg.append("g")
+          .attr("class","features")
+          .attr("class","landmass");
+
+        features.selectAll("path")
+          .data(topojson.feature(geodata,geodata.objects.collection).features)
+          .enter()
+          .append("path")
+          .attr("d",path);
+
         // Path that will show the route of the line we're looking at:
-        map_svg.append("path").attr("class", "route-line"); 
+        map_svg.append("path").attr("class", "route-line");
     });
 
     // Returns whether the given route ID is selected
@@ -50,10 +76,15 @@ angular.module('app').controller('AppCtrl', ['$scope', 'DATA_SOURCES', function(
         return (agencyName == $scope.activeAgency);
     }
 
+    $scope.getRouteColor = function(agencyName, routeId) {
+      var route = agencyData[agencyName].routes[routeId];
+      return ROUTE_COLORS[route.name];
+    }
+
     // Display the Graph for a particular route
     $scope.displayRoute = function(agencyName, routeId, params) {
         console.log("Showing %s route %s", agencyName, routeId);
-        
+
         console.log("event = %o", $scope);
 
         $scope.activeRoute = routeId;
@@ -65,14 +96,7 @@ angular.module('app').controller('AppCtrl', ['$scope', 'DATA_SOURCES', function(
             return agencyData[agencyName].stops[stop_id];
         });
 
-        // find the color to use to draw this route in the graph and the map
-        console.log("params = %o", params);
-        if(params && params["color_override"]){
-            routeColor = params["color_override"];
-        }else{
-            routeColor = agencyData[agencyName].routes[routeId].color;
-        }
-        if (routeColor === undefined) routeColor = "#666";
+        routeColor = ROUTE_COLORS[route.name];
 
         // dimensions
         var w = 580,
