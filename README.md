@@ -1,7 +1,8 @@
-Inequality & Mass Transit in the Bay Area
+Inequality & Mass Transit in Chicago
 =====================
 
-This is a mashup to overlay demographic info with the all the major mass transit routes in the San Francisco Bay Area.
+This is a mashup to overlay demographic info with the all the major mass transit routes in the Chicago area,
+based on an [analysis done on San Francisco](https://github.com/dangrover/sf-transit-inequality).
 
 This **master** branch you’re looking at has the Python code used to generate the data files used by the visualization.. The visualization itself is in the **gh-pages** branch.
 
@@ -11,7 +12,7 @@ To run the Javascript app locally, you can e.g. use Python's one-line web server
 
 First go into the repo directory:
 
-    cd sf-transit-inequality
+    cd chi-transit-inequality
 
 Then check out the gh-pages branch:
 
@@ -28,13 +29,13 @@ Finally, open your browser and navigate to [http://localhost:8000/](http://local
 
 
 ### Modifying for other cities and demographic data
-To generate the JSON file that the mashup reads data from, run grab_routes.py. 
+To generate the JSON file that the mashup reads data from, run grab_routes.py.
 
-To change it to graph another city, change ALL_GTFS_PATHS in config.py to point to other GTFS feeds available from the transit agency of your choice. 
+To change it to graph another city, change ALL_GTFS_PATHS in config.py to point to other GTFS feeds available from the transit agency of your choice.
 
 To graph other dimensions, change the MEDIAN_INCOME_TABLE_NAME constant to some other American Community Survey column name. More info available at census.gov. Also, be sure to use your own API key!
 
 ### Python Requirements
  * [census](https://github.com/sunlightlabs/census)
  * [requests](http://docs.python-requests.org/en/latest/)
- * [transitfeed](https://code.google.com/p/googletransitdatafeed/wiki/TransitFeed) 
+ * [transitfeed](https://code.google.com/p/googletransitdatafeed/wiki/TransitFeed)
