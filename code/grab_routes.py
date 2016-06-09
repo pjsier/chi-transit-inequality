@@ -6,7 +6,7 @@ import requests
 
 from config import *
 
-# This script builds a JSON file containing a transit systems 
+# This script builds a JSON file containing a transit systems
 # routes coupled with census data. Uses GTFS feeds and the census API.
 
 census_api = census.Census(CENSUS_API_KEY, year=2010)
@@ -16,13 +16,12 @@ def get_fips(latitude, longitude):
 	r = requests.get("http://data.fcc.gov/api/block/find?format=json&latitude=%f&longitude=%f&showall=true" % (latitude, longitude))
 	return r.json()
 
-
-# Make a file for each agency covered 
+# Make a file for each agency covered
 for agency_name, path in ALL_GTFS_PATHS.iteritems():
 	print "Starting %s" % agency_name
 	agency_json = {"agency_name":agency_name, "stops":{}, "routes":{}}
 
-	is_muni = (agency_name == "MUNI")
+	cta_train_list = ['Red', 'P', 'Y', 'Blue', 'Pink', 'G', 'Org', 'Brn']
 
 	schedule = transitfeed.schedule.Schedule()
 	schedule.Load(path)
@@ -32,18 +31,20 @@ for agency_name, path in ALL_GTFS_PATHS.iteritems():
 
 	stop_ids_to_use = set() # Don't grab census info for stops on routes we're ignoring
 
-	# Build route list
-	for r in routes:
-		if is_muni: # 
-			#Skip bus lines that we decided not to count
-			if (not r.route_type == 0) and not r.route_short_name in MUNI_ALLOWED_ROUTE_SHORT_NAMES:
-				print "Skipping non-train route %s" % r
-				continue
+	cta_train_routes = []
+	cta_train_stops = []
 
-			# Normalize their route names
-			route_name = r.route_short_name + " " + r.route_long_name
-		else:
-			route_name = r.route_long_name
+	for r in routes:
+		if r.route_id in cta_train_list:
+			cta_train_routes.append(r)
+
+	for s in stops:
+		if s.stop_id > 30000:
+			cta_train_stops.append(s)
+
+	# Build route list
+	for r in cta_train_routes:
+		route_name = r.route_long_name
 
 		# Get an ordered list of stops by looking at this route's "trips."
 		# Some of them will be limited runs, so we want to pick the trip that covers
@@ -59,9 +60,9 @@ for agency_name, path in ALL_GTFS_PATHS.iteritems():
 		route_json = {"name":route_name, "stop_ids":stop_ids_in_order}
 		agency_json["routes"][r.route_id] = route_json
 
-	
+
 	#  Build stop list, look up related info
-	for s in stops:
+	for s in cta_train_stops:
 		if not s.stop_id in stop_ids_to_use:
 			continue
 
@@ -81,7 +82,7 @@ for agency_name, path in ALL_GTFS_PATHS.iteritems():
 			stop_json = {"lat":s.stop_lat, "lon":s.stop_lon, "name":s.stop_name, "state_fips":state_fips, "county_fips":county_fips, "tract_fips":tract_fips, "median_income":median_income}
 			agency_json["stops"][s.stop_id] = stop_json
 
-			if median_income: 
+			if median_income:
 				print "%s...$%d" % (s.stop_name,median_income)
 
 		except Exception, e:
@@ -93,4 +94,3 @@ for agency_name, path in ALL_GTFS_PATHS.iteritems():
 	output_file = open(output_path, "wb")
 	output_file.write(json.dumps(agency_json))
 	output_file.close()
-	
